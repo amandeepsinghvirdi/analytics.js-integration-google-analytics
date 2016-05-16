@@ -641,10 +641,16 @@ describe('Google Analytics', function() {
               name: 'my product',
               sku: 'p-298'
             }, {
+              id: 2,
               quantity: 3,
               price: 24.75,
               name: 'other product',
               sku: 'p-299'
+            }, {
+              id: 3,
+              quantity: 3,
+              price: 24.75,
+              name: 'no sku product'
             }]
           });
 
@@ -677,7 +683,17 @@ describe('Google Analytics', function() {
             currency: 'USD'
           }]);
 
-          analytics.deepEqual(window.ga.args[4], ['ecommerce:send']);
+          analytics.deepEqual(window.ga.args[4], ['ecommerce:addItem', {
+            id: '780bc55',
+            category: undefined,
+            name: 'no sku product',
+            price: 24.75,
+            sku: 3,
+            quantity: 3,
+            currency: 'USD'
+          }]);
+
+          analytics.deepEqual(window.ga.args[5], ['ecommerce:send']);
         });
 
         it('should fallback to revenue', function() {
@@ -790,6 +806,32 @@ describe('Google Analytics', function() {
           analytics.deepEqual(window.ga.args[2], ['ec:addProduct', {
             id: 'p-298',
             name: 'my product',
+            category: 'cat 1',
+            quantity: 1,
+            price: 24.75,
+            brand: undefined,
+            variant: undefined,
+            currency: 'CAD'
+          }]);
+          analytics.deepEqual(window.ga.args[3], ['ec:setAction', 'add', {}]);
+          analytics.deepEqual(window.ga.args[4], ['send', 'event', 'cat 1', 'added product', { nonInteraction: 1 }]);
+        });
+
+        it('should send added product data without sku', function() {
+          analytics.track('added product', {
+            id: 1,
+            currency: 'CAD',
+            quantity: 1,
+            price: 24.75,
+            name: 'no sku product',
+            category: 'cat 1'
+          });
+
+          analytics.assert(window.ga.args.length === 5);
+          analytics.deepEqual(window.ga.args[1], ['set', '&cu', 'CAD']);
+          analytics.deepEqual(window.ga.args[2], ['ec:addProduct', {
+            id: 1,
+            name: 'no sku product',
             category: 'cat 1',
             quantity: 1,
             price: 24.75,
@@ -1146,16 +1188,24 @@ describe('Google Analytics', function() {
               category: 'cat 1',
               sku: 'p-298'
             }, {
+              id: 2,
               quantity: 3,
               price: 24.75,
               name: 'other product',
               category: 'cat 2',
               sku: 'p-299',
               currency: 'EUR'
+            }, {
+              id: 3,
+              quantity: 3,
+              price: 24.75,
+              name: 'no sku product',
+              category: 'cat 3',
+              currency: 'EUR'
             }]
           });
 
-          analytics.assert(window.ga.args.length === 6);
+          analytics.assert(window.ga.args.length === 7);
           analytics.deepEqual(window.ga.args[1], ['set', '&cu', 'CAD']);
           analytics.deepEqual(window.ga.args[2], ['ec:addProduct', {
             id: 'p-298',
@@ -1177,7 +1227,17 @@ describe('Google Analytics', function() {
             variant: undefined,
             currency: 'EUR'
           }]);
-          analytics.deepEqual(window.ga.args[4], ['ec:setAction', 'purchase', {
+          analytics.deepEqual(window.ga.args[4], ['ec:addProduct', {
+            id: 3,
+            name: 'no sku product',
+            category: 'cat 3',
+            quantity: 3,
+            price: 24.75,
+            brand: undefined,
+            variant: undefined,
+            currency: 'EUR'
+          }]);
+          analytics.deepEqual(window.ga.args[5], ['ec:setAction', 'purchase', {
             id: '780bc55',
             affiliation: 'affiliation',
             revenue: 99.9,
@@ -1185,7 +1245,7 @@ describe('Google Analytics', function() {
             shipping: 13.99,
             coupon: 'coupon'
           }]);
-          analytics.deepEqual(window.ga.args[5], ['send', 'event', 'EnhancedEcommerce', 'completed order', { nonInteraction: 1 }]);
+          analytics.deepEqual(window.ga.args[6], ['send', 'event', 'EnhancedEcommerce', 'completed order', { nonInteraction: 1 }]);
         });
 
         it('should add coupon to product level in completed order', function() {
@@ -1205,16 +1265,24 @@ describe('Google Analytics', function() {
               sku: 'p-298',
               coupon: 'promo'
             }, {
+              id: 2,
               quantity: 3,
               price: 24.75,
               name: 'other product',
               category: 'cat 2',
               sku: 'p-299',
               currency: 'EUR'
+            }, {
+              id: 3,
+              quantity: 3,
+              price: 24.75,
+              name: 'no sku product',
+              category: 'cat 3',
+              currency: 'EUR'
             }]
           });
 
-          analytics.assert(window.ga.args.length === 6);
+          analytics.assert(window.ga.args.length === 7);
           analytics.deepEqual(window.ga.args[1], ['set', '&cu', 'CAD']);
           analytics.deepEqual(window.ga.args[2], ['ec:addProduct', {
             id: 'p-298',
@@ -1237,7 +1305,17 @@ describe('Google Analytics', function() {
             variant: undefined,
             currency: 'EUR'
           }]);
-          analytics.deepEqual(window.ga.args[4], ['ec:setAction', 'purchase', {
+          analytics.deepEqual(window.ga.args[4], ['ec:addProduct', {
+            id: 3,
+            name: 'no sku product',
+            category: 'cat 3',
+            quantity: 3,
+            price: 24.75,
+            brand: undefined,
+            variant: undefined,
+            currency: 'EUR'
+          }]);
+          analytics.deepEqual(window.ga.args[5], ['ec:setAction', 'purchase', {
             id: '780bc55',
             affiliation: 'affiliation',
             revenue: 99.9,
@@ -1245,7 +1323,7 @@ describe('Google Analytics', function() {
             shipping: 13.99,
             coupon: 'coupon'
           }]);
-          analytics.deepEqual(window.ga.args[5], ['send', 'event', 'EnhancedEcommerce', 'completed order', { nonInteraction: 1 }]);
+          analytics.deepEqual(window.ga.args[6], ['send', 'event', 'EnhancedEcommerce', 'completed order', { nonInteraction: 1 }]);
         });
 
         it('completed order should fallback to revenue', function() {
@@ -1286,10 +1364,13 @@ describe('Google Analytics', function() {
             }, {
               quantity: 2,
               sku: 'p-299'
+            }, {
+              quantity: 2,
+              id: 3
             }]
           });
 
-          analytics.assert(window.ga.args.length === 6);
+          analytics.assert(window.ga.args.length === 7);
           analytics.deepEqual(window.ga.args[2], ['ec:addProduct', {
             id: 'p-298',
             quantity: 1
@@ -1298,10 +1379,14 @@ describe('Google Analytics', function() {
             id: 'p-299',
             quantity: 2
           }]);
-          analytics.deepEqual(window.ga.args[4], ['ec:setAction', 'refund', {
+          analytics.deepEqual(window.ga.args[4], ['ec:addProduct', {
+            id: 3,
+            quantity: 2
+          }]);
+          analytics.deepEqual(window.ga.args[5], ['ec:setAction', 'refund', {
             id: '780bc55'
           }]);
-          analytics.deepEqual(window.ga.args[5], ['send', 'event', 'EnhancedEcommerce', 'refunded order', { nonInteraction: 1 }]);
+          analytics.deepEqual(window.ga.args[6], ['send', 'event', 'EnhancedEcommerce', 'refunded order', { nonInteraction: 1 }]);
         });
       });
     });
@@ -1519,6 +1604,11 @@ describe('Google Analytics', function() {
               price: 24.75,
               name: 'other product',
               sku: 'p-299'
+            }, {
+              id: 3,
+              quantity: 3,
+              price: 24.75,
+              name: 'no sku product'
             }]
           });
 
@@ -1555,12 +1645,22 @@ describe('Google Analytics', function() {
           ]]);
 
           analytics.deepEqual(window._gaq.push.args[3], [[
+            '_addItem',
+            'af5ccd73',
+            3,
+            'no sku product',
+            undefined,
+            24.75,
+            3
+          ]]);
+
+          analytics.deepEqual(window._gaq.push.args[4], [[
             '_set',
             'currencyCode',
             'USD'
           ]]);
 
-          analytics.deepEqual(window._gaq.push.args[4], [[
+          analytics.deepEqual(window._gaq.push.args[5], [[
             '_trackTrans'
           ]]);
         });
